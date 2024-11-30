@@ -27,8 +27,7 @@ const ambientLight = new Three.AmbientLight(0xffffff, 5);
 scene.add(ambientLight);
 ambientLight.position.x=1
 ambientLight.position.y=1
-const axesHelper = new Three.AxesHelper(2);
-scene.add(axesHelper)
+
 const loader = new GLTFLoader();
 loader.load(
   "./3Dlogo.gltf",
