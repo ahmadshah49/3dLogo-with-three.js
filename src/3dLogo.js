@@ -64,7 +64,7 @@ loader.load(
 
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.enableZoom = true;
+controls.enableZoom = false;
 controls.dampingFactor = 0.1; 
 
 
