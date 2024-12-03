@@ -11,6 +11,7 @@ const material = new Three.MeshStandardMaterial({
   color: "green",
   side: Three.DoubleSide,
 });
+
 // material.shininess = 90;
 
 const plane = new Three.Mesh(planeGeometry, material);
@@ -55,11 +56,7 @@ controls.target.set(0, 0, 0);
 controls.enableDamping = true; 
 controls.zoomSpeed = 1.2; 
 controls.enablePan = true;
-controls.mouseButtons = {
-  LEFT: Three.MOUSE.ROTATE,
-  MIDDLE: Three.MOUSE.DOLLY, // Middle mouse button for zooming
-  RIGHT: Three.MOUSE.PAN,
-};
+controls.autoRotate=true
 const clock = new Three.Clock();
 
 let prevTime = 0;
@@ -74,7 +71,10 @@ const renderLoop = () => {
   const delta = currentTime - prevTime;
   prevTime = currentTime;
 
-  plane.rotation.y += Three.MathUtils.degToRad(1) * delta * 40;
+  // plane.rotation.y += Three.MathUtils.degToRad(1) * delta * 40;
+
+    
+  
   controls.update();
 
   renderer.setSize(window.innerWidth, window.innerHeight);

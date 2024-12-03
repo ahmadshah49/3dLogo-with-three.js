@@ -114,6 +114,7 @@ const planets = [
     ],
   },
 ];
+
 const createPlanet = (planet) => {
   const planetMesh = new Three.Mesh(sphereGeometry, planet.material);
   planetMesh.scale.setScalar(planet.radius);
@@ -184,3 +185,6 @@ const renderLoop = () => {
   window.requestAnimationFrame(renderLoop);
 };
 renderLoop();
+
+// const earthTexture = textureLoader.load("../public/textures/planet.png");
+// earthTexture.colorSpace = Three.SRGBColorSpace;
