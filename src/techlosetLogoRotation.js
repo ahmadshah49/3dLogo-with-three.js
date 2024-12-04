@@ -71,9 +71,9 @@ loader.load("./3Dlogo.gltf", (gltf) => {
   let direction = 1; // 1 for clockwise, -1 for counter-clockwise
 
   // Restrict rotation range
-  const restrictRotation = (rotation) => {
-    return Math.max(-Math.PI / 8, Math.min(Math.PI / 8, rotation));
-  };
+  // const restrictRotation = (rotation) => {
+  //   return Math.max(-Math.PI / 1, Math.min(Math.PI / 1, rotation));
+  // };
 
   // Mouse drag event handlers
   const onMouseDown = (event) => {
@@ -86,7 +86,7 @@ loader.load("./3Dlogo.gltf", (gltf) => {
     if (isDragging) {
       const deltaX = event.clientX - previousMouseX;
       rotationDeltaY = deltaX * 0.004; // Adjust sensitivity
-      model.rotation.y = restrictRotation(model.rotation.y + rotationDeltaY);
+      model.rotation.y = (model.rotation.y + rotationDeltaY);
       previousMouseX = event.clientX;
     }
   };
@@ -104,7 +104,7 @@ loader.load("./3Dlogo.gltf", (gltf) => {
       model.rotation.y += defaultRotationSpeed * direction;
 
       // Bounce back at limits
-      if (model.rotation.y >= Math.PI / 8 || model.rotation.y <= -Math.PI / 8) {
+      if (model.rotation.y >= Math.PI / 1 || model.rotation.y <= -Math.PI / 1) {
         direction *= -1; // Reverse direction
         model.rotation.y = restrictRotation(model.rotation.y); // Ensure it stays within bounds
       }
@@ -229,7 +229,7 @@ fontLoader.load("/fonts/Outfit_Thin_Regular.json", (font) => {
 
 // Animate
 let angle = 0;
-function animate() {
+
   angle += 0.01;
 
   sphere1.position.x = 3 * Math.cos(angle);
@@ -250,13 +250,14 @@ function animate() {
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
-}
+
 animate();
 
 // Orbit controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = false;
 controls.enableZoom=false
+controls.enabled=false
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
