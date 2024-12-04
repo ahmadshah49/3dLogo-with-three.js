@@ -22,9 +22,8 @@ const planetTexture = textureLoader.load("../public/textures/planet.png");
 planetTexture.colorSpace = Three.SRGBColorSpace;
 
 const canvas = document.querySelector("canvas.threeJs");
-const renderer = new Three.WebGLRenderer({ canvas ,antialias:true});
+const renderer = new Three.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-
 
 // Lighting
 const ambientLight = new Three.AmbientLight(0xffffff, 1);
@@ -40,94 +39,45 @@ pointLight.position.set(4, 2, 0);
 pointLight.castShadow = true;
 scene.add(pointLight);
 
-// Load central model
-// const loader = new GLTFLoader();
-// loader.load("./3Dlogo.gltf", (gltf) => {
-//   const model = gltf.scene;
-//   model.scale.setScalar(30);
-//   // model.rotation.y=-0.04
-//   scene.add(model);
-//   function animate() {
-//     requestAnimationFrame(animate);
-
-//     // Apply a rotation to the model (rotate around Y-axis for spinning)
-//     model.rotation.y += 0.01; // Adjust the value for faster/slower spinning
-
-//     renderer.render(scene, camera); // Render the scene
-//   }
-
-//   animate(); // Start the animation
-// });
 const loader = new GLTFLoader();
 loader.load("./3Dlogo.gltf", (gltf) => {
   const model = gltf.scene;
   model.scale.setScalar(30); // Scale the model
   scene.add(model);
 
-  let isDragging = false; // Track whether the user is dragging
-  let previousMouseX = 0; // Store the last mouse X position
-  let rotationDeltaY = 0; // Track the rotation change during dragging
-  let defaultRotationSpeed = 0.02; // Default rotation speed
-  let direction = 1; // 1 for clockwise, -1 for counter-clockwise
-
-  // Restrict rotation range
-  // const restrictRotation = (rotation) => {
-  //   return Math.max(-Math.PI / 1, Math.min(Math.PI / 1, rotation));
-  // };
-
-  // Mouse drag event handlers
-  const onMouseDown = (event) => {
-    isDragging = true;
-    previousMouseX = event.clientX;
-    event.preventDefault(); // Prevent any default behavior (like scrolling)
-  };
-
+  // Function to update model rotation based on mouse movement
   const onMouseMove = (event) => {
-    if (isDragging) {
-      const deltaX = event.clientX - previousMouseX;
-      rotationDeltaY = deltaX * 0.004; // Adjust sensitivity
-      model.rotation.y = (model.rotation.y + rotationDeltaY);
-      previousMouseX = event.clientX;
-    }
+    // Normalize mouse position: range of -1 to 1 (from left to right)
+    const mouseX = (event.clientX / window.innerWidth) * 2 - 1; // From -1 to 1 (horizontal axis)
+    // const mouseY = -(event.clientY / window.innerHeight) * 2 + 1; // From -1 to 1 (vertical axis)
+
+    // Apply rotation based on mouse position
+    // Rotate the model around the Y-axis (left and right)
+    model.rotation.y = Three.MathUtils.lerp(
+      -Math.PI / 6,
+      Math.PI / 6,
+      (mouseX + 1) / 2
+    ); // Limit to -PI/2 to PI/2
+
+    // Rotate the model around the X-axis (up and down), with a limit of +-PI/4
+    model.rotation.x = Three.MathUtils.lerp(
+      -Math.PI / 4,
+      Math.PI / 4,
+      (mouseY + 1) / 2
+    ); // Limit to -PI/4 to PI/4
   };
 
-  const onMouseUp = () => {
-    isDragging = false;
-  };
+  // Listen for mouse movement
+  window.addEventListener("mousemove", onMouseMove);
 
-  // Animation loop
+  // Animation loop (if you want to keep other animations running)
   function animate() {
     requestAnimationFrame(animate);
-
-    // Default rotation logic
-    if (!isDragging) {
-      model.rotation.y += defaultRotationSpeed * direction;
-
-      // Bounce back at limits
-      if (model.rotation.y >= Math.PI / 1 || model.rotation.y <= -Math.PI / 1) {
-        direction *= -1; // Reverse direction
-        model.rotation.y = restrictRotation(model.rotation.y); // Ensure it stays within bounds
-      }
-    }
-
     renderer.render(scene, camera);
   }
 
-  // Add event listeners for drag
-  window.addEventListener("mousedown", onMouseDown);
-  window.addEventListener("mousemove", onMouseMove);
-  window.addEventListener("mouseup", onMouseUp);
-
-  // Prevent the scene or camera from moving when mouse events occur
-  window.addEventListener("wheel", (event) => {
-    event.preventDefault(); // Disable scroll behavior
-  });
-
-  // Start the animation loop
-  animate();
+  animate(); // Start the animation
 });
-
-
 
 // Sphere 1
 const sphere1Geometry = new Three.SphereGeometry(0.1, 32, 32);
@@ -136,7 +86,7 @@ const sphere1Material = new Three.MeshStandardMaterial({
   map: planetTexture,
 });
 const sphere1 = new Three.Mesh(sphere1Geometry, sphere1Material);
-sphere1.rotateOnAxis=2
+sphere1.rotateOnAxis = 2;
 scene.add(sphere1);
 
 const orbit1Curve = new Three.EllipseCurve(0, 0, 3, 2, 0, 2 * Math.PI, false);
@@ -170,7 +120,7 @@ const sphere2Material = new Three.MeshStandardMaterial({
   map: planetTexture,
 });
 const sphere2 = new Three.Mesh(sphere2Geometry, sphere2Material);
-sphere2.rotateX
+sphere2.rotateX;
 scene.add(sphere2);
 
 const orbit2Curve = new Three.EllipseCurve(0, 0, 4, 3, 0, 2 * Math.PI, false);
@@ -211,8 +161,8 @@ const orbit3Geometry = new Three.BufferGeometry().setFromPoints(orbit3Points);
 const orbit3Material = new Three.LineBasicMaterial({ color: 0x888888 });
 const orbit3 = new Three.Line(orbit3Geometry, orbit3Material);
 orbit3.rotation.x = Math.PI / 2;
-  // orbit3.rotation.y = Math.PI / 10; // 45 degrees tilt
-  // orbit3.rotation.z = Math.PI / 16; // 45 degrees tilt
+// orbit3.rotation.y = Math.PI / 10; // 45 degrees tilt
+// orbit3.rotation.z = Math.PI / 16; // 45 degrees tilt
 scene.add(orbit3);
 
 fontLoader.load("/fonts/Outfit_Thin_Regular.json", (font) => {
@@ -229,7 +179,7 @@ fontLoader.load("/fonts/Outfit_Thin_Regular.json", (font) => {
 
 // Animate
 let angle = 0;
-
+function animate() {
   angle += 0.01;
 
   sphere1.position.x = 3 * Math.cos(angle);
@@ -244,21 +194,20 @@ let angle = 0;
 
   sphere3.position.x = 5 * Math.cos(angle + 0.4);
   sphere3.position.z = 4 * Math.sin(angle + 0.4);
-  sphere3.position.y = 0
-  
+  sphere3.position.y = 0;
+
   sphere3.lookAt(0, 0, 0);
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
-
+}
 animate();
 
 // Orbit controls
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = false;
-controls.enableZoom=false
-controls.enabled=false
-
+controls.enableDamping = true;
+controls.enableZoom = false;
+controls.enabled = false;
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
