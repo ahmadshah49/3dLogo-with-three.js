@@ -64,39 +64,70 @@ loader.load("./3Dlogo.gltf", (gltf) => {
   model.scale.setScalar(30); // Scale the model
   scene.add(model);
 
-  // Function to update model rotation based on mouse movement
-  const onMouseMove = (event) => {
-    // Normalize mouse position: range of -1 to 1 (from left to right)
-    const mouseX = (event.clientX / window.innerWidth) * 2 - 1; // From -1 to 1 (horizontal axis)
-    // const mouseY = -(event.clientY / window.innerHeight) * 2 + 1; // From -1 to 1 (vertical axis)
+  let isDragging = false; // Track whether the user is dragging
+  let previousMouseX = 0; // Store the last mouse X position
+  let rotationDeltaY = 0; // Track the rotation change during dragging
+  let defaultRotationSpeed = 0.02; // Default rotation speed
+  let direction = 1; // 1 for clockwise, -1 for counter-clockwise
 
-    // Apply rotation based on mouse position
-    // Rotate the model around the Y-axis (left and right)
-    model.rotation.y = Three.MathUtils.lerp(
-      -Math.PI / 8,
-      Math.PI / 8,
-      (mouseX + 1) / 2
-    ); // Limit to -PI/2 to PI/2
-
-    // Rotate the model around the X-axis (up and down), with a limit of +-PI/4
-    model.rotation.x = Three.MathUtils.lerp(
-      -Math.PI / 4,
-      Math.PI / 4,
-      (mouseY + 1) / 2
-    ); // Limit to -PI/4 to PI/4
+  // Restrict rotation range
+  const restrictRotation = (rotation) => {
+    return Math.max(-Math.PI / 8, Math.min(Math.PI / 8, rotation));
   };
 
-  // Listen for mouse movement
-  window.addEventListener("mousemove", onMouseMove);
+  // Mouse drag event handlers
+  const onMouseDown = (event) => {
+    isDragging = true;
+    previousMouseX = event.clientX;
+    event.preventDefault(); // Prevent any default behavior (like scrolling)
+  };
 
-  // Animation loop (if you want to keep other animations running)
+  const onMouseMove = (event) => {
+    if (isDragging) {
+      const deltaX = event.clientX - previousMouseX;
+      rotationDeltaY = deltaX * 0.004; // Adjust sensitivity
+      model.rotation.y = restrictRotation(model.rotation.y + rotationDeltaY);
+      previousMouseX = event.clientX;
+    }
+  };
+
+  const onMouseUp = () => {
+    isDragging = false;
+  };
+
+  // Animation loop
   function animate() {
     requestAnimationFrame(animate);
+
+    // Default rotation logic
+    if (!isDragging) {
+      model.rotation.y += defaultRotationSpeed * direction;
+
+      // Bounce back at limits
+      if (model.rotation.y >= Math.PI / 8 || model.rotation.y <= -Math.PI / 8) {
+        direction *= -1; // Reverse direction
+        model.rotation.y = restrictRotation(model.rotation.y); // Ensure it stays within bounds
+      }
+    }
+
     renderer.render(scene, camera);
   }
 
-  animate(); // Start the animation
+  // Add event listeners for drag
+  window.addEventListener("mousedown", onMouseDown);
+  window.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("mouseup", onMouseUp);
+
+  // Prevent the scene or camera from moving when mouse events occur
+  window.addEventListener("wheel", (event) => {
+    event.preventDefault(); // Disable scroll behavior
+  });
+
+  // Start the animation loop
+  animate();
 });
+
+
 
 // Sphere 1
 const sphere1Geometry = new Three.SphereGeometry(0.1, 32, 32);
@@ -224,7 +255,7 @@ animate();
 
 // Orbit controls
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+controls.enableDamping = false;
 controls.enableZoom=false
 
 window.addEventListener("resize", () => {
